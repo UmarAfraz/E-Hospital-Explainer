@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E Hospital Explainer - AI Medical Report Translation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1976D2;
+            --light-blue: #64B5F6;
+            --dark-blue: #0D47A1;
+            --bg-light: #F5F9FF;
+            --white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border: #E0E0E0;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #FFFFFF 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 20px rgba(25, 118, 210, 0.2);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem;
+            border-radius: 1rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-text h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-text p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: var(--error);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        main {
+            padding: 3rem 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out;
+            border: 1px solid var(--border);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            background: var(--bg-light);
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Sample Buttons */
+        .sample-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-large {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-download {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-download:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* Form Elements */
+        textarea {
+            width: 100%;
+            padding: 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9375rem;
+            resize: vertical;
+            min-height: 220px;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-blue);
+            background: rgba(25, 118, 210, 0.05);
+        }
+
+        .file-upload-area.has-file {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(25, 118, 210, 0.1);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results */
+        .results-card {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            border: 2px solid var(--primary-blue);
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .icon-btn {
+            background: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.25rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .summary-box {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .summary-stat {
+            text-align: center;
+            padding: 1.25rem;
+            background: var(--bg-light);
+            border-radius: 0.75rem;
+        }
+
+        .summary-stat-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .summary-stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .explanation-text {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            font-size: 1rem;
+        }
+
+        .error-card {
+            background: #FEF2F2;
+            border: 2px solid var(--error);
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 3.5rem;
+            color: var(--error);
+            margin-bottom: 1rem;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: #FEF3C7;
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .disclaimer-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            color: #92400E;
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .disclaimer-text {
+            color: #78350F;
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-text h1 {
+                font-size: 2rem;
+            }
+            
+            .sample-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .status-indicator {
+                position: static;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container" style="position: relative;">
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Checking...</span>
+            </div>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-hospital-alt"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>E Hospital Explainer</h1>
+                        <p>AI-Powered Medical Report Translation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Input Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon"><i class="fas fa-file-medical"></i></span>
+                    <h2 class="card-title">Step 1: Enter Medical Report</h2>
+                </div>
+
+                <div class="sample-buttons">
+                    <button class="btn btn-secondary" onclick="loadSample('cbc')">
+                        <i class="fas fa-microscope"></i> Sample: Normal CBC
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadSample('lipid')">
+                        <i class="fas fa-heartbeat"></i> Sample: Lipid Panel
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadSample('imaging')">
+                        <i class="fas fa-x-ray"></i> Sample: X-Ray Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearInput()">
+                        <i class="fas fa-eraser"></i> Clear All
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Paste your medical report here:</label>
+                    <textarea id="reportInput" placeholder="Example:
+
+Complete Blood Count (CBC)
+WBC: 7.5 × 10^9/L [4.0-11.0]
+RBC: 4.8 × 10^12/L [4.5-5.9]
+Hemoglobin: 14.5 g/dL [13.5-17.5]
+Platelets: 250 × 10^9/L [150-400]"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">OR Upload a file:</label>
+                    <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-blue);">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Click to upload file</div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary);">PDF, TXT, or DOCX (Max 5MB)</div>
+                        <div class="file-name" id="fileName"></div>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt,.docx" onchange="handleFileUpload(event)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Report Type:</label>
+                    <select id="reportType">
+                        <option value="auto">Auto-Detect</option>
+                        <option value="blood_test">Blood Test</option>
+                        <option value="imaging">Imaging Report</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary btn-large" onclick="explainReport()">
+                    <i class="fas fa-magic"></i> Generate Patient-Friendly Explanation
+                </button>
+            </div>
+
+            <!-- Loading Section -->
+            <div id="loadingSection" class="card hidden">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">AI is processing your report...</h3>
+                    <p style="color: var(--text-secondary);">This usually takes 2-3 seconds</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden">
+                <!-- Results will be inserted here -->
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="hidden">
+                <!-- Errors will be inserted here -->
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <div class="disclaimer-header">
+                    <i class="fas fa-exclamation-triangle"></i> Important Disclaimer
+                </div>
+                <div class="disclaimer-text">
+                    This tool is for educational purposes only and is not medical advice. 
+                    Always consult your healthcare provider for medical decisions, diagnosis, 
+                    treatment recommendations, and any health concerns.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5001/api';
+        let uploadedFile = null;
+
+        // Check backend health on load
+        window.addEventListener('load', checkBackendHealth);
+
+        async function checkBackendHealth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('statusDot').classList.remove('offline');
+                    document.getElementById('statusText').textContent = 'Connected';
+                } else {
+                    showOfflineStatus();
+                }
+            } catch (error) {
+                showOfflineStatus();
+            }
+        }
+
+        function showOfflineStatus() {
+            document.getElementById('statusDot').classList.add('offline');
+            document.getElementById('statusText').textContent = 'Offline';
+        }
+
+        function loadSample(type) {
+            const samples = {
+                cbc: `Complete Blood Count (CBC)
+WBC: 7.5 × 10^9/L [4.0-11.0]
+RBC: 4.8 × 10^12/L [4.5-5.9]
+Hemoglobin: 14.5 g/dL [13.5-17.5]
+Hematocrit: 42% [38-50]
+Platelets: 250 × 10^9/L [150-400]`,
+                lipid: `Lipid Panel
+Total Cholesterol: 235 mg/dL [<200]
+LDL Cholesterol: 155 mg/dL [<100]
+HDL Cholesterol: 48 mg/dL [>40]
+Triglycerides: 165 mg/dL [<150]`,
+                imaging: `CHEST X-RAY
+FINDINGS: The lungs are clear. No focal consolidation, pleural effusion, or pneumothorax.
+Heart size is normal. No acute osseous abnormality is detected.
+IMPRESSION: No acute cardiopulmonary process.`
+            };
+            
+            document.getElementById('reportInput').value = samples[type] || '';
+            clearUploadedFile();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['application/pdf', 'text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const allowedExtensions = ['.pdf', '.txt', '.docx'];
+            
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+                alert('Please upload a PDF, TXT, or DOCX file.');
+                event.target.value = '';
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB.');
+                event.target.value = '';
+                return;
+            }
+
+            uploadedFile = file;
+            document.getElementById('fileName').innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
+            document.getElementById('fileUploadArea').classList.add('has-file');
+            document.getElementById('reportInput').value = '';
+            document.getElementById('reportInput').disabled = true;
+        }
+
+        function clearUploadedFile() {
+            uploadedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('fileUploadArea').classList.remove('has-file');
+            document.getElementById('reportInput').disabled = false;
+        }
+
+        function clearInput() {
+            document.getElementById('reportInput').value = '';
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('errorSection').classList.add('hidden');
+            clearUploadedFile();
+        }
+
+        async function explainReport() {
+            const reportText = document.getElementById('reportInput').value.trim();
+            const reportType = document.getElementById('reportType').value;
+
+            if (!reportText && !uploadedFile) {
+                alert('Please enter a medical report or upload a file!');
+                return;
+            }
+
+            // Hide previous results/errors
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('errorSection').classList.add('hidden');
+            
+            // Show loading
+            document.getElementById('loadingSection').classList.remove('hidden');
+
+            try {
+                let response;
+                
+                if (uploadedFile) {
+                    const formData = new FormData();
+                    formData.append('file', uploadedFile);
+                    formData.append('report_type', reportType);
+
+                    response = await fetch(`${API_BASE_URL}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    response = await fetch(`${API_BASE_URL}/explain`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            report_text: reportText,
+                            report_type: reportType
+                        })
+                    });
+                }
+
+                const data = await response.json();
+
+                // Hide loading
+                document.getElementById('loadingSection').classList.add('hidden');
+
+                if (data.success) {
+                    displayResults(data.data);
+                } else {
+                    displayError(data.error || 'An error occurred while processing your report.');
+                }
+            } catch (error) {
+                document.getElementById('loadingSection').classList.add('hidden');
+                displayError('Failed to connect to backend. Make sure the server is running on port 5001.');
+            }
+        }
+
+        function displayResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+            
+            let summaryHTML = '';
+            if (data.summary) {
+                summaryHTML = `
+                    <div class="summary-box">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Summary</h3>
+                        <div class="summary-stats">
+                            <div class="summary-stat">
+                                <div class="summary-stat-value">${data.summary.total_tests || 0}</div>
+                                <div class="summary-stat-label">Total Tests</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-value" style="color: var(--success);">${data.summary.normal_results || 0}</div>
+                                <div class="summary-stat-label">Normal</div>
+                            </div>
+                            <div class="summary-stat">
+                                <div class="summary-stat-value" style="color: var(--warning);">${data.summary.abnormal_results || 0}</div>
+                                <div class="summary-stat-label">Abnormal</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsSection.innerHTML = `
+                <div class="results-card">
+                    <div class="results-header">
+                        <div class="results-title">
+                            <span><i class="fas fa-check-circle" style="color: var(--success);"></i></span>
+                            <span>Patient-Friendly Explanation</span>
+                        </div>
+                        <div class="results-actions">
+                            <button class="icon-btn" onclick="downloadResults()" title="Download Results">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="icon-btn" onclick="copyExplanation()" title="Copy to clipboard">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="icon-btn" onclick="clearInput()" title="Clear results">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${summaryHTML}
+                    
+                    <div class="explanation-text" id="explanationText">
+${data.explanation || 'No explanation available'}
+                    </div>
+                    
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button class="btn btn-primary" onclick="clearInput()">
+                            <i class="fas fa-redo"></i> Analyze Another Report
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            resultsSection.classList.remove('hidden');
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function displayError(message) {
+            const errorSection = document.getElementById('errorSection');
+            
+            errorSection.innerHTML = `
+                <div class="error-card">
+                    <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
+                    <h3 style="color: var(--error); margin-bottom: 1rem; font-size: 1.5rem;">Error</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">${message}</p>
+                    <button class="btn btn-secondary" onclick="clearInput()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            `;
+            
+            errorSection.classList.remove('hidden');
+        }
+
+        function copyExplanation() {
+            const text = document.getElementById('explanationText').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✓ Explanation copied to clipboard!');
+            }).catch(() => {
+                alert('✗ Failed to copy. Please select and copy manually.');
+            });
+        }
+
+        function downloadResults() {
+            const text = document.getElementById('explanationText').textContent;
+            const reportType = document.getElementById('reportType').value;
+            
+            // Create a formatted text document
+            const content = `E HOSPITAL EXPLAINER
+AI-Powered Medical Report Explanation
+=====================================
+
+Generated: ${new Date().toLocaleString()}
+Report Type: ${reportType}
+
+EXPLANATION:
+${text}
+
+=====================================
+DISCLAIMER: This explanation is for educational purposes only and is NOT medical advice.
+Always consult your healthcare provider for medical decisions.
+`;
+
+            // Create and download file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `medical-report-explanation-${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            alert('✓ Results downloaded successfully!');
+        }
+    </script>
+</body>
+</html>
